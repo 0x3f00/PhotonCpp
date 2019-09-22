@@ -13,6 +13,8 @@ To read data from STDIN use '-' as filename.
 To write data from STDOUT use '-' as filename.
 
 White and transparent areas of the image are treated as voids.
-I insist on checking output with Photon File Validator after procedure. Use output at your own risk.
+I insist on checking output with Photon File Validator after conversion. Use output at your own risk.
 
+# Building
 
+There is MSVC project for Windows and Makefile for Linux and MacOS X.

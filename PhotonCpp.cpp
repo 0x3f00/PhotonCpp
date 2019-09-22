@@ -138,7 +138,7 @@ int main(int argc, char * argv[])
 		"To read data from STDIN use '-' as filename.\n"
 		"To write data to STDOUT use '-' as filename.\n\n"
 		"White and transparent areas of the image are treated as voids.\n"
-		"Check with Photon File Validator after procedure. Use output at your own risk.\n";
+		"Check with Photon File Validator after conversion. Use output at your own risk.\n";
 		return -1;
 	}
 
