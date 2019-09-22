@@ -3,7 +3,7 @@
 
 # PngToPhoton
 
-Quick and dirty utility I've made to convert PNG files to Anycubic Photon 3d printer file format. It could be useful for PCB production.
+Quick and dirty utility I've made to convert PNG files to Anycubic Photon 3d printer file format. It could be useful for PCB production. Source code was ported to C++ from [Photon File Validator] (https://github.com/Photonsters/PhotonFileValidator) project.
 
 # Usage
 
