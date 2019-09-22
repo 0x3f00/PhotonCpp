@@ -9,23 +9,21 @@
 #ifndef PCH_H
 #define PCH_H
 
-#include <stdlib.h>
 #include <malloc.h>
 #include <memory.h>
-#include <tchar.h>
+#include <fcntl.h>
+#include <io.h>
 
 #include <vector>
 #include <array>
 #include <set>
 #include <map>
-#include <memory>
 #include <string>
+#include <iostream>
 #include <fstream>
 #include <streambuf>
 #include <sstream>
-#include <algorithm>
 #include <cassert>
-#include <ctime>
 
 namespace photoncpp {
 	using MatrixInt = std::vector<std::vector<int>>;

@@ -2,35 +2,41 @@
 //
 
 #include "pch.h"
-#include <iostream>
 
 #define STB_IMAGE_IMPLEMENTATION
 #define STBI_ONLY_PNG
 #include "stb_image.h"
 
 
-PhotonLayer png2rle(const std::string & bufferPng)
+std::pair<std::string, PhotonLayer> png2layer(const std::string & bufferPng)
 {
 	char* img = nullptr;
 	int w = 0;
 	int h = 0;
 	int n = 0;
 	img = (char*)stbi_load_from_memory((unsigned char*)bufferPng.data(), bufferPng.length(), &w, &h, &n, 4);
-
 	PhotonLayer res(w, h);
+
+	if (!img)
+		return {"Invalid PNG file format", res};
+
+	if (w != 1440 || h != 2560)
+		return { "Invalid PNG image size: (" + std::to_string(w) + "x" + std::to_string(h) + " instead of 1440x2560)", res };
+
 	for (int j = 0; j < h; j++)
 		for (int i = 0; i < w; i++)
 		{
 			int pos = ((w * j) + i) * 4;
-			if (img[pos])
+			bool present = (img[pos + 3] != 0 /* not alpha transparent */) && (img[pos] == 0 /* probably black */);
+			if (present)
 				res.supported(i, j);
 		}
 
 	stbi_image_free(img);
-	return res;
+	return { "", res };
 }
 
-std::string get_model()
+std::string getModel()
 {
 	const unsigned char gz[] = { 
 120, 94, 147, 100, 248, 43, 196, 196, 192, 192, 80, 45, 210, 225, 212, 250,
@@ -124,52 +130,68 @@ std::string get_model()
 	return res;
 }
 
-int main()
+int main(int argc, char * argv[])
 {
-	get_model();
+	if (argc != 2)
+	{
+		std::cerr << "\nUsage: PngToPhoton.exe input-1440x2560.png > output.photon\n"
+		"To read data from STDIN use '-' as filename.\n\n"
+		"White and transparent areas of the image are treated as voids.\n"
+		"Check with Photon File Validator after procedure. Use output at your own risk.\n";
+		return -1;
+	}
 
-//	std::ifstream t("E:\\projects\\PhotonCpp\\_model.photon", std::ios_base::binary);
-//	t.seekg(0, std::ios::end);
-	std::streamoff size = 0;
-//	std::streamoff size = t.tellg();
-//	std::string buffer((unsigned int)size, ' ');
-	std::string buffer = get_model();
-	//	t.seekg(0);
-//	t.read(&buffer[0], size);
-//	t.close();
+	_setmode(_fileno(stdout), _O_BINARY);
+	_setmode(_fileno(stdin), _O_BINARY);
 
-//	char * p = &buffer[0] + size;
+	std::string bufferModel = getModel();
 
-	PhotonFileHeader photonFileHeader(buffer);
-	PhotonFilePreview previewOne(photonFileHeader.getPreviewOneOffsetAddress(), buffer);
-	PhotonFilePreview previewTwo(photonFileHeader.getPreviewTwoOffsetAddress(), buffer);
+	PhotonFileHeader photonFileHeader(bufferModel);
+	PhotonFilePreview previewOne(photonFileHeader.getPreviewOneOffsetAddress(), bufferModel);
+	PhotonFilePreview previewTwo(photonFileHeader.getPreviewTwoOffsetAddress(), bufferModel);
 	
 	PhotonFilePrintParameters photonFilePrintParameters;
 	if (photonFileHeader.getVersion() > 1) 
 	{
-		PhotonFilePrintParameters dummy(photonFileHeader.getPrintParametersOffsetAddress(), buffer);
+		PhotonFilePrintParameters dummy(photonFileHeader.getPrintParametersOffsetAddress(), bufferModel);
 		photonFilePrintParameters = std::move(dummy);
 	}
 
 	int margin = 0;
 	
-	std::vector<PhotonFileLayer> layers = PhotonFileLayer::readLayers(photonFileHeader, buffer, margin);
+	std::vector<PhotonFileLayer> layers = PhotonFileLayer::readLayers(photonFileHeader, bufferModel, margin);
 
 //	PhotonFileLayer::calculateLayers(photonFileHeader,layers, 0);
 
 	// load png
-	std::ifstream ifPng("E:\\projects\\PhotonCpp\\fff-B_Cu-1.svg.png", std::ios_base::binary);
-//	std::ifstream ifPng("E:\\projects\\PhotonCpp\\solid.png", std::ios_base::binary);
+	std::string bufferPng;
 	
-	ifPng.seekg(0, std::ios::end);
-	size = ifPng.tellg();
-	std::string bufferPng((unsigned int)size, ' ');
-	ifPng.seekg(0);
-	ifPng.read(&bufferPng[0], size);
-	ifPng.close();
+	if (std::string("-") == argv[1])
+	{
+		std::string tmp(std::istreambuf_iterator<char>(std::cin), {});
+		bufferPng = std::move(tmp);
+	}
+	else
+	{
+		std::ifstream ifPng(argv[1], std::ios_base::binary);
 
-	PhotonLayer layerPng = png2rle(bufferPng);
-	//std::vector<PhotonFileLayer> layersPng = PhotonFileLayer::cloneLayers(photonFileHeader, dataRle);
+		ifPng.seekg(0, std::ios::end);
+		std::streamoff size = 0;
+		size = ifPng.tellg();
+		bufferPng.resize((unsigned int)size);
+		ifPng.seekg(0);
+		ifPng.read(&bufferPng[0], size);
+		ifPng.close();
+	}
+
+	std::pair<std::string, PhotonLayer> rle = png2layer(bufferPng);
+	if (!rle.first.empty())
+	{
+		std::cerr << rle.first << "\n";
+		return -1;
+	}
+
+	PhotonLayer & layerPng = rle.second;
 	int antiAliasLevel = 1;
 	if (photonFileHeader.getVersion() > 1) {
 		antiAliasLevel = photonFileHeader.getAntiAliasingLevel();
@@ -189,9 +211,6 @@ int main()
 
 
 	// writing is here:
-
-	std::ofstream ofs("E:\\projects\\PhotonCpp\\_out.photon", std::ios_base::binary);
-
 	int headerPos = 0;
 	int previewOnePos = headerPos + photonFileHeader.getByteSize();
 	int previewTwoPos = previewOnePos + previewOne.getByteSize();
@@ -206,7 +225,7 @@ int main()
 	int dataPosition = layerDefinitionPos + (PhotonFileLayer::getByteSize() * photonFileHeader.getNumberOfLayers() * antiAliasLevel);
 
 
-	PhotonOutputStream os(ofs);
+	PhotonOutputStream os(std::cout);
 
 	photonFileHeader.save(os, previewOnePos, previewTwoPos, layerDefinitionPos, parametersPos);
 	previewOne.save(os, previewOnePos);
@@ -250,8 +269,6 @@ int main()
 			}
 		}
 	}
-
-    std::cout << "Hello World!\n"; 
 
 	return 0;
 }

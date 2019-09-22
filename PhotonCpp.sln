@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.705
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PhotonCpp", "PhotonCpp.vcxproj", "{73A1723A-15E8-4177-A26A-E1F251E0F6B9}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PngToPhoton", "PhotonCpp.vcxproj", "{73A1723A-15E8-4177-A26A-E1F251E0F6B9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
