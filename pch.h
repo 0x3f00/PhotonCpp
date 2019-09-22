@@ -11,14 +11,20 @@
 
 #include <malloc.h>
 #include <memory.h>
+
+#ifdef WIN32
 #include <fcntl.h>
 #include <io.h>
+#endif // WIN32
+
+
 
 #include <vector>
 #include <array>
 #include <set>
 #include <map>
 #include <string>
+#include <algorithm>
 #include <iostream>
 #include <fstream>
 #include <streambuf>

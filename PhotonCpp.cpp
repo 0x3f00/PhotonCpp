@@ -132,17 +132,20 @@ std::string getModel()
 
 int main(int argc, char * argv[])
 {
-	if (argc != 2)
+	if (argc != 3)
 	{
-		std::cerr << "\nUsage: PngToPhoton.exe input-1440x2560.png > output.photon\n"
-		"To read data from STDIN use '-' as filename.\n\n"
+		std::cerr << "\nUsage: PngToPhoton <input-1440x2560.png> <output.photon>\n"
+		"To read data from STDIN use '-' as filename.\n"
+		"To write data to STDOUT use '-' as filename.\n\n"
 		"White and transparent areas of the image are treated as voids.\n"
 		"Check with Photon File Validator after procedure. Use output at your own risk.\n";
 		return -1;
 	}
 
+#ifdef WIN32
 	_setmode(_fileno(stdout), _O_BINARY);
 	_setmode(_fileno(stdin), _O_BINARY);
+#endif // WIN32
 
 	std::string bufferModel = getModel();
 
@@ -174,6 +177,12 @@ int main(int argc, char * argv[])
 	else
 	{
 		std::ifstream ifPng(argv[1], std::ios_base::binary);
+
+		if (ifPng.fail())
+		{
+			std::cerr << "Error opening input file.\n";
+			return -1;
+		}
 
 		ifPng.seekg(0, std::ios::end);
 		std::streamoff size = 0;
@@ -225,8 +234,18 @@ int main(int argc, char * argv[])
 	int dataPosition = layerDefinitionPos + (PhotonFileLayer::getByteSize() * photonFileHeader.getNumberOfLayers() * antiAliasLevel);
 
 
-	PhotonOutputStream os(std::cout);
+	std::ofstream ofs;
+	if (std::string("-") != argv[2])
+	{
+		ofs.open(argv[2], std::ios_base::binary);
+		if (ofs.fail())
+		{
+			std::cerr << "Error opening output file.\n";
+			return -1;
+		}
+	}
 
+	PhotonOutputStream os( std::string("-") != argv[2] ? ofs : std::cout);
 	photonFileHeader.save(os, previewOnePos, previewTwoPos, layerDefinitionPos, parametersPos);
 	previewOne.save(os, previewOnePos);
 	previewTwo.save(os, previewTwoPos);
