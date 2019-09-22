@@ -9,7 +9,6 @@
 #ifndef PCH_H
 #define PCH_H
 
-#include <malloc.h>
 #include <memory.h>
 
 #ifdef WIN32

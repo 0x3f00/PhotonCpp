@@ -95,7 +95,7 @@ private:
 
             int repeat = 1;
             if ((dot & 0x0020) == 0x0020) {
-                repeat += rawImageData_[i+1] & 0xFF | ((rawImageData_[i+2] & 0x0F) << 8);
+                repeat += (rawImageData_[i+1] & 0xFF) | ((rawImageData_[i+2] & 0x0F) << 8);
 				i += 2;
             }
 

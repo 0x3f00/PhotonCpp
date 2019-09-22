@@ -9,7 +9,7 @@ DEPS = pch.h PhotonAaMatrix.h PhotonDot.h PhotonFileHeader.h \
        PhotonOutputStream.h PhotonProjectType.h PhotonRow.h stb_image.h
 
 PngToPhoton: 
-	$(CC) -o PngToPhoton PhotonCpp.cpp $(CPPFLAGS)
+	$(CC) -std=c++11 -o PngToPhoton PhotonCpp.cpp $(CPPFLAGS)
 
 
 

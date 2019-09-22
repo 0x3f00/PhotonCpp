@@ -176,9 +176,9 @@ public:
     }
 
     bool connected(int x, int y) {
-        return x > 0 && (iArray[y][x - 1] & 0x01) == PhotonDot::SUPPORTED
-                || x < (width_ - 1) && (iArray[y][x + 1] & 0x01) == PhotonDot::SUPPORTED
-                || y > 0 && (iArray[y - 1][x] & 0x01) == PhotonDot::SUPPORTED
+        return (x > 0 && (iArray[y][x - 1] & 0x01) == PhotonDot::SUPPORTED)
+                || (x < (width_ - 1) && (iArray[y][x + 1] & 0x01) == PhotonDot::SUPPORTED)
+                || (y > 0 && (iArray[y - 1][x] & 0x01) == PhotonDot::SUPPORTED)
                 || (y < (height_ - 1) && (iArray[y + 1][x] & 0x01) == PhotonDot::SUPPORTED);
     }
 
@@ -252,7 +252,7 @@ public:
             int length = rle & 0x1F;
             if (extended) {
                 i++;
-                length = (length << 8) | packedLayerImage[i] & 0x00ff;
+                length = (length << 8) | (packedLayerImage[i] & 0x00ff);
             }
 
             for(int xi = x; xi<(x+length); xi++) {
@@ -325,7 +325,7 @@ public:
                 int length = rle & 0x1F;
                 if (extended) {
                     i++;
-                    length = (length << 8) | packedLayerImage[i] & 0x00ff;
+                    length = (length << 8) | (packedLayerImage[i] & 0x00ff);
                 }
                 currentRow.lines_.push_back(PhotonLine(color, length));
                 x += length;

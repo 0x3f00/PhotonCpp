@@ -203,7 +203,7 @@ public:
     }
 
     void calculate(std::vector<photoncpp::BitSet> & unpackedImage, std::vector<photoncpp::BitSet> & previousUnpackedImage, PhotonLayer & photonLayer) {
-        islandRows_;
+        //islandRows_;
         isLandsCount_ = 0;
 
         photonLayer.clear();
