@@ -73,6 +73,23 @@ public:
         unknown4_ = ds.readInt();
     }
 
+	PhotonFileLayer(float layerPositionZ, int32_t width, int32_t height) {
+		width_ = width;
+		height_ = height;
+		layerPositionZ_ = layerPositionZ;
+		layerExposure_ = 60.f;
+		layerOffTimeSeconds_ = 3.f;
+
+		dataAddress_ = 0;
+		dataSize_ = 0;
+
+		unknown1_ = 0;
+		unknown2_ = 0;
+		unknown3_ = 0;
+		unknown4_ = 0;
+	}
+
+
 	PhotonFileLayer(PhotonFileLayer & photonFileLayer, int32_t width, int32_t height) {
 		width_ = width;
 		height_ = height;
@@ -262,6 +279,55 @@ public:
 
         return layers;
     }
+
+
+/*	static std::vector<PhotonFileLayer> cloneLayers(const PhotonFileHeader & photonFileHeader_, const std::string & dataLayer) {
+		PhotonLayer photonLayer(photonFileHeader_.getResolutionX(), photonFileHeader_.getResolutionY());
+
+		std::vector<PhotonFileLayer> layers;
+
+		int antiAliasLevel = 1;
+		if (photonFileHeader_.getVersion() > 1) {
+			antiAliasLevel = photonFileHeader_.getAntiAliasingLevel();
+		}
+
+		int layerCount = photonFileHeader_.getNumberOfLayers();
+
+		{
+			std::map<int, PhotonFileLayer> layerMap;
+			for (int i = 0; i < layerCount; i++) {
+
+				//iPhotonProgress.showInfo("Reading photon file layer " + (i + 1) + "/" + photonFileHeader_.getNumberOfLayers());
+
+				PhotonFileLayer layer(0.05f * i, photonFileHeader_.getResolutionX(), photonFileHeader_.getResolutionY());
+				layer.imageData_ = dataLayer;
+				layer.dataSize_ = dataLayer.length();
+				layers.push_back(layer);
+				layerMap[i] = layer;
+			}
+
+			if (antiAliasLevel > 1) {
+				for (int a = 0; a < (antiAliasLevel - 1); a++) {
+					for (int i = 0; i < layerCount; i++) {
+						//iPhotonProgress.showInfo("Reading photon file AA " + (2 + a) + "/" + antiAliasLevel + " layer " + (i + 1) + "/" + photonFileHeader_.getNumberOfLayers());
+
+						PhotonFileLayer layer(0.05f * i, photonFileHeader_.getResolutionX(), photonFileHeader_.getResolutionY());
+						layer.imageData_ = dataLayer;
+						layer.dataSize_ = dataLayer.length();
+
+						layerMap[i].addAntiAliasLayer(layer);
+					}
+				}
+			}
+		}
+
+		photonLayer.unLink();
+		//System.gc();
+
+		return layers;
+	}
+	*/
+
 
     void addAntiAliasLayer(const PhotonFileLayer & layer) {
         antiAliasLayers_.push_back(layer);

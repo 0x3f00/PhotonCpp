@@ -56,7 +56,6 @@ public:
         rowIslands.resize(height);
         rowUnsupported.resize(height);
         rowSupported.resize(height);
-
     }
 
     void clear() {

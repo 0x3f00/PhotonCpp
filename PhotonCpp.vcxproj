@@ -165,6 +165,7 @@
     <ClInclude Include="PhotonOutputStream.h" />
     <ClInclude Include="PhotonProjectType.h" />
     <ClInclude Include="PhotonRow.h" />
+    <ClInclude Include="stb_image.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">

@@ -27,7 +27,6 @@
 #include <cassert>
 #include <ctime>
 
-
 namespace photoncpp {
 	using MatrixInt = std::vector<std::vector<int>>;
 	using Color = uint32_t;
